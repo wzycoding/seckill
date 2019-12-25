@@ -29,9 +29,6 @@ public class Result<T> {
 
     /**
      * 返回成功
-     * @param data
-     * @param <T>
-     * @return
      */
     public static <T> Result<T> success(T data) {
         return new Result<T>(data);
@@ -39,9 +36,6 @@ public class Result<T> {
 
     /**
      * 返回失败
-     * @param codeMsg
-     * @param <T>
-     * @return
      */
     public static <T> Result<T> error(CodeMsg codeMsg) {
         return new Result<T>(codeMsg);

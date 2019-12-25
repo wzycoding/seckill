@@ -21,12 +21,6 @@ import java.util.List;
 @Controller
 public class GoodsController {
 
-    @Autowired
-    private SeckillUserService seckillService;
-
-    @Autowired
-    private GoodsService goodsService;
-
     @RequestMapping("/to_list")
     public String toList(Model model,
                          SeckillUser seckillUser) {
@@ -37,6 +31,11 @@ public class GoodsController {
         model.addAttribute("goodsList", goodsList);
         return "goods_list";
     }
+
+    @Autowired
+    private SeckillUserService seckillService;
+    @Autowired
+    private GoodsService goodsService;
 
 
 }

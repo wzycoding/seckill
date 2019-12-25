@@ -1,29 +1,21 @@
 package com.wzy.seckill.domain;
 
+import lombok.Data;
+
 /**
+ * 测试用户表
  * @author wzy
  * @version 1.0
  * @date 2019/12/16 10:52
  */
-
+@Data
 public class User {
+    /**
+     * id
+     */
     private Integer id;
-
+    /**
+     * 用户名
+     */
     private String name;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 /**
+ * 商品dao
  * @author wzy
  * @version 1.0
  * @date 2019/12/19 21:17

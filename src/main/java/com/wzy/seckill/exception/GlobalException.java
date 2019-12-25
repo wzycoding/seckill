@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
+ * 全局异常
  * @author wzy
  * @version 1.0
  * @date 2019/12/19 12:43

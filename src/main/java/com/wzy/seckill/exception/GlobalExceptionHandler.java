@@ -2,6 +2,7 @@ package com.wzy.seckill.exception;
 
 import com.wzy.seckill.result.CodeMsg;
 import com.wzy.seckill.result.Result;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
@@ -20,11 +21,14 @@ import java.util.List;
  */
 @ControllerAdvice
 @ResponseBody
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public Result<String> exceptionHandler(HttpServletRequest request,
                                            Exception e) {
+        log.error(e.getMessage());
+        e.printStackTrace();
         if (e instanceof BindException) {
             BindException ex = (BindException) e;
             List<ObjectError> errors = ex.getAllErrors();

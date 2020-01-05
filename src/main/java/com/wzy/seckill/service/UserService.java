@@ -2,9 +2,10 @@ package com.wzy.seckill.service;
 
 import com.wzy.seckill.dao.UserDao;
 import com.wzy.seckill.domain.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 
 /**
  * @author wzy
@@ -13,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class UserService {
-    @Autowired
+    @Resource
     private UserDao userDao;
 
     public User getById(int id){

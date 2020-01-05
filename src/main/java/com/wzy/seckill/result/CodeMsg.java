@@ -46,6 +46,11 @@ public class CodeMsg {
 
     //订单模块5004xx
 
+    //秒杀模块5005xx
+    public static CodeMsg STOCK_OVER  = new CodeMsg(500500, "商品已经秒杀结束");
+    public static CodeMsg REPEAT_SECKILL  = new CodeMsg(500501, "请勿重复秒杀商品");
+
+
 
     public CodeMsg fillArgs(Object...args) {
         int code = this.code;

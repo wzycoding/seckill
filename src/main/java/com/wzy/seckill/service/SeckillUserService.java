@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,10 +28,10 @@ import javax.servlet.http.HttpServletResponse;
 public class SeckillUserService {
 
     public static final String COOKIE_NAME_TOKEN = "token";
-    @Autowired
+    @Resource
     private SeckillUserDao seckillUserDao;
 
-    @Autowired
+    @Resource
     private RedisService redisService;
 
 //    public SeckillUser getById(Long id) {

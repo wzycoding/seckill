@@ -28,7 +28,7 @@ public class RedisService {
      * @return
      */
     public <T> T get(KeyPrefix prefix, String key, Class<T> clazz) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
             String realKey = prefix.getPrefix() + key;
@@ -49,7 +49,7 @@ public class RedisService {
      * @return
      */
     public <T> boolean set(KeyPrefix prefix, String key, T value) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
             String str = beanToString(value);
@@ -79,7 +79,7 @@ public class RedisService {
      * @return
      */
     public <T> boolean exists(KeyPrefix prefix, String key) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
             String realKey = prefix.getPrefix() + key;
@@ -97,7 +97,7 @@ public class RedisService {
      * @return
      */
     public <T> Long incr(KeyPrefix prefix, String key) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
             String realKey = prefix.getPrefix() + key;
@@ -115,7 +115,7 @@ public class RedisService {
      * @return
      */
     public <T> Long decr(KeyPrefix prefix, String key) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
             String realKey = prefix.getPrefix() + key;

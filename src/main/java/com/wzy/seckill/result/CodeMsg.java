@@ -31,6 +31,7 @@ public class CodeMsg {
     public static CodeMsg SUCCESS = new CodeMsg(0, "success");
     public static CodeMsg SERVER_ERROR = new CodeMsg(500100, "服务器端异常");
     public static CodeMsg BIND_ERROR = new CodeMsg(500101, "参数校验异常：%s");
+    public static CodeMsg FREQUENT_VISITS = new CodeMsg(500102, "访问过于频繁，请稍后再试");
 
     //登录模块5002xx
     public static CodeMsg SESSION_ERROR = new CodeMsg(500200, "Session不存在或者已经失效");

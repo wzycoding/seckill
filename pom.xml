@@ -102,6 +102,13 @@
       <version>${springboot.version}</version>
     </dependency>
 
+    <!-- guava -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>28.0-jre</version>
+    </dependency>
+
 
     <!--单元测试-->
     <dependency>

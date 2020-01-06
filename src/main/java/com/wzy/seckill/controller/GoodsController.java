@@ -2,17 +2,24 @@ package com.wzy.seckill.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.wzy.seckill.domain.SeckillUser;
+import com.wzy.seckill.redis.GoodsPrefix;
+import com.wzy.seckill.redis.RedisService;
 import com.wzy.seckill.service.GoodsService;
-import com.wzy.seckill.service.SeckillUserService;
 import com.wzy.seckill.vo.GoodsVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.thymeleaf.context.WebContext;
+import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -26,8 +33,11 @@ import java.util.List;
 @Slf4j
 public class GoodsController {
 
-    @RequestMapping("/to_list")
-    public String toList(Model model,
+    @RequestMapping(value = "/to_list", produces = "text/html")
+    @ResponseBody
+    public String toList(HttpServletRequest request,
+                         HttpServletResponse response,
+                         Model model,
                          SeckillUser seckillUser) {
         model.addAttribute("user", seckillUser);
 
@@ -35,18 +45,31 @@ public class GoodsController {
         List<GoodsVo> goodsList = goodsService.listGoodsVo();
         log.info("goodsList:" + JSON.toJSONString(goodsList));
         model.addAttribute("goodsList", goodsList);
+        String html = redisService.get(GoodsPrefix.goodsList, "", String.class);
+        if (StringUtils.isNotBlank(html)) {
+            return html;
+        }
+        WebContext ctx = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
+        html = thymeleafViewResolver.getTemplateEngine().process("goods_list", ctx);
+        if (StringUtils.isNotBlank(html)) {
+            redisService.set(GoodsPrefix.goodsList, "", html);
+        }
 
-        return "goods_list";
+        return html;
     }
 
-    @RequestMapping("/to_detail/{goodsId}")
-    public String detail(Model model,
+    @RequestMapping(value = "/to_detail/{goodsId}", produces = "text/html")
+    @ResponseBody
+    public String detail(HttpServletRequest request,
+                         HttpServletResponse response,
+                         Model model,
                          SeckillUser seckillUser,
                          @PathVariable("goodsId") long goodsId) {
         model.addAttribute("user", seckillUser);
         //todo:应该通过雪花算法生成id
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
         model.addAttribute("goods", goods);
+
         long startAt = goods.getStartDate().getTime();
         long endAt = goods.getEndDate().getTime();
         long now = System.currentTimeMillis();
@@ -66,11 +89,25 @@ public class GoodsController {
         model.addAttribute("seckillStatus", seckillStatus);
         model.addAttribute("remainSeconds", remainSeconds);
         model.addAttribute("goods", goods);
-        return "goods_detail";
+
+        String html = redisService.get(GoodsPrefix.goodsDetail, "" + goodsId, String.class);
+        if (StringUtils.isNotBlank(html)) {
+            return html;
+        }
+        WebContext ctx = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
+        html = thymeleafViewResolver.getTemplateEngine().process("goods_detail", ctx);
+        if (StringUtils.isNotBlank(html)) {
+            redisService.set(GoodsPrefix.goodsDetail, "" + goodsId, html);
+        }
+        return html;
     }
 
     @Autowired
-    private SeckillUserService seckillUserService;
+    private ThymeleafViewResolver thymeleafViewResolver;
+
+    @Autowired
+    private RedisService redisService;
+
     @Resource
     private GoodsService goodsService;
 

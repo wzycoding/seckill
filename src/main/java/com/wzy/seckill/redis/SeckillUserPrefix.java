@@ -7,7 +7,7 @@ package com.wzy.seckill.redis;
  * @date 2019/12/17 10:09
  */
 public class SeckillUserPrefix extends BasePrefix {
-    public static final int TOKEN_EPIRE = 3600 * 24 * 2;
+    public static final int TOKEN_EXPIRE = 3600 * 24 * 2;
     private SeckillUserPrefix(String prefix) {
         super(prefix);
     }
@@ -16,5 +16,7 @@ public class SeckillUserPrefix extends BasePrefix {
         super(expireSeconds, prefix);
     }
 
-    public static SeckillUserPrefix token = new SeckillUserPrefix(TOKEN_EPIRE, "tk");
+    public static SeckillUserPrefix token = new SeckillUserPrefix(TOKEN_EXPIRE, "tk");
+    public static SeckillUserPrefix getById = new SeckillUserPrefix(0, "id");
+
 }

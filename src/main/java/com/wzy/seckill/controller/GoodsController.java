@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.wzy.seckill.domain.SeckillUser;
 import com.wzy.seckill.redis.GoodsPrefix;
 import com.wzy.seckill.redis.RedisService;
+import com.wzy.seckill.result.Result;
 import com.wzy.seckill.service.GoodsService;
+import com.wzy.seckill.vo.GoodsDetailVo;
 import com.wzy.seckill.vo.GoodsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -33,22 +35,30 @@ import java.util.List;
 @Slf4j
 public class GoodsController {
 
+    /**
+     * QPS: 1677.9
+     * QPS: 2165(页面缓存后)
+     * 5000 * 2
+     * todo:页面缓存后Jmeter测试有问题
+     */
     @RequestMapping(value = "/to_list", produces = "text/html")
     @ResponseBody
     public String toList(HttpServletRequest request,
                          HttpServletResponse response,
                          Model model,
                          SeckillUser seckillUser) {
-        model.addAttribute("user", seckillUser);
 
-        //查询商品列表
-        List<GoodsVo> goodsList = goodsService.listGoodsVo();
-        log.info("goodsList:" + JSON.toJSONString(goodsList));
-        model.addAttribute("goodsList", goodsList);
+        //取缓存
         String html = redisService.get(GoodsPrefix.goodsList, "", String.class);
         if (StringUtils.isNotBlank(html)) {
             return html;
         }
+        model.addAttribute("user", seckillUser);
+        //查询商品列表
+        List<GoodsVo> goodsList = goodsService.listGoodsVo();
+        log.info("goodsList:" + JSON.toJSONString(goodsList));
+        model.addAttribute("goodsList", goodsList);
+
         WebContext ctx = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
         html = thymeleafViewResolver.getTemplateEngine().process("goods_list", ctx);
         if (StringUtils.isNotBlank(html)) {
@@ -58,9 +68,38 @@ public class GoodsController {
         return html;
     }
 
-    @RequestMapping(value = "/to_detail/{goodsId}", produces = "text/html")
+    @RequestMapping(value = "/detail/{goodsId}")
     @ResponseBody
-    public String detail(HttpServletRequest request,
+    public Result<GoodsDetailVo> detail(@PathVariable("goodsId") long goodsId, SeckillUser user) {
+        //todo:应该通过雪花算法生成id
+        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
+        long startAt = goods.getStartDate().getTime();
+        long endAt = goods.getEndDate().getTime();
+        long now = System.currentTimeMillis();
+
+        //秒杀状态
+        int seckillStatus = 0;
+        //剩余多少秒
+        int remainSeconds = 0;
+        if (now < startAt) {//秒杀还没有开始，倒计时
+            remainSeconds = (int)(startAt - now) / 1000;
+        } else if (now > endAt) {//秒杀已经结束
+            seckillStatus = 2;
+            remainSeconds = -1;
+        } else {//秒杀正在进行中
+            seckillStatus = 1;
+        }
+        GoodsDetailVo goodsDetailVo = new GoodsDetailVo();
+        goodsDetailVo.setGoodsVo(goods);
+        goodsDetailVo.setSeckillStatus(seckillStatus);
+        goodsDetailVo.setRemainSeconds(remainSeconds);
+        goodsDetailVo.setUser(user);
+        return Result.success(goodsDetailVo);
+    }
+
+    @RequestMapping(value = "/to_detail2/{goodsId}", produces = "text/html")
+    @ResponseBody
+    public String detail2(HttpServletRequest request,
                          HttpServletResponse response,
                          Model model,
                          SeckillUser seckillUser,

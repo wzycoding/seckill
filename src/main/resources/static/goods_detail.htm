@@ -42,10 +42,8 @@
 
             </td>
             <td>
-                <form id="miaoshaForm" method="post" action="/seckill/do_seckill">
-                    <button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
-                    <input type="hidden" id="goodsId" name="goodsId" />
-                </form>
+                <button class="btn btn-primary btn-block" id="buyButton" onclick="doSeckill()">立即秒杀</button>
+                <input type="hidden" id="goodsId" name="goodsId" />
             </td>
         </tr>
         <tr>
@@ -66,6 +64,26 @@
     $(function() {
         getDetail();
     });
+    function doSeckill() {
+        $.ajax({
+            url: "/seckill/do_seckill",
+            method: "POST",
+            data: {
+                goodsId: $("#goodsId").val()
+            },
+            success:function (result) {
+                if (result.code == 0) {
+                    console.log(result.data)
+                    window.location.href = "/order_detail.htm?orderId=" + result.data.orderInfo.id;
+                } else {
+                    layer.msg(result.msg)
+                }
+            },
+            error: function(result) {
+                layer.msg("客户端请求错误")
+            }
+        });
+    }
 
     /**
      * 获取商品的详情
@@ -123,6 +141,9 @@
         countDown();
     }
 
+    /**
+     * 秒杀倒计时
+     */
     function countDown() {
         var remainSeconds = $("#remainSeconds").val();
         var timeout;

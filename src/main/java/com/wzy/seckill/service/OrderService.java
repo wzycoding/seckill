@@ -13,12 +13,12 @@ import java.util.Date;
 @Service
 public class OrderService {
 
+    @Resource
+    private OrderDao orderDao;
+
     public SeckillOrder getSeckillOrderByUserIdAndGoodsId(long userId, long goodsId) {
         return orderDao.getSeckillOrderByUserIdAndGoodsId(userId, goodsId);
     }
-
-    @Resource
-    private OrderDao orderDao;
 
     public OrderInfo createOrder(SeckillUser user, GoodsVo goodsVo) {
         OrderInfo orderInfo = new OrderInfo();
@@ -40,4 +40,10 @@ public class OrderService {
         orderDao.insertSeckillOrder(seckillOrder);
         return orderInfo;
     }
+
+    public OrderInfo getOrderById(long orderId) {
+        return orderDao.getOrderById(orderId);
+    }
+
+
 }

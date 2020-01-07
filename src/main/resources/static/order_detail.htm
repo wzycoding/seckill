@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <!-- jquery -->
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+    <!-- jquery-validator -->
+    <script type="text/javascript" src="/jquery-validation/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/jquery-validation/localization/messages_zh.min.js"></script>
+    <!-- layer -->
+    <script type="text/javascript" src="/layer/layer.js"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" src="/js/md5.min.js"></script>
+    <!-- common.js -->
+    <script type="text/javascript" src="/js/common.js"></script>
+    <title>订单详情</title>
+</head>
+<body>
+<div class="panel panel-default">
+    <div class="panel-heading">秒杀订单详情</div>
+    <table class="table" id="goodslist">
+        <tr>
+            <td>商品名称</td>
+            <td id="goodsName" colspan="3"></td>
+        </tr>
+        <tr>
+            <td>商品图片</td>
+            <td colspan="2"><img id="goodsImg" width="200" height="200" /></td>
+        </tr>
+        <tr>
+            <td>订单价格</td>
+            <td colspan="2" id="goodsPrice"></td>
+        </tr>
+        <tr>
+            <td>下单时间</td>
+            <td id="createDate" colspan="2"></td>
+        </tr>
+        <tr>
+            <td>订单状态</td>
+            <td id="status">
+
+            </td>
+            <td>
+                <button class="btn btn-primary btn-block" type="submit" id="payButton">立即支付</button>
+            </td>
+        </tr>
+        <tr>
+            <td>收货人</td>
+            <td colspan="2">XXX  18812341234</td>
+        </tr>
+        <tr>
+            <td>收货地址</td>
+            <td colspan="2">北京市昌平区回龙观龙博一区</td>
+        </tr>
+    </table>
+</div>
+<script>
+    $(function() {
+        getOrderInfo();
+    });
+    function render(orderDetail) {
+        var user = orderDetail.user;
+        var goods = orderDetail.goods;
+        var orderInfo = orderDetail.orderInfo;
+
+        $("#goodsName").text(goods.goodsName);
+        $("#goodsImg").attr("src", goods.goodsImg);
+        $("#goodsPrice").text(goods.goodsPrice);
+
+        $("#createDate").text(new Date(orderInfo.createDate).format("yyyy-MM-dd hh:mm:ss"))
+
+        if(orderInfo.status == 0) {
+            $("#status").text("待付款");
+        } else if (orderInfo.status == 1) {
+            $("#status").text("待发货");
+        } else if (orderInfo.status == 2) {
+            $("#status").text("已发货");
+        } else if (orderInfo.status == 3) {
+            $("#status").text("已收货");
+        } else if (orderInfo.status == 4) {
+            $("#status").text("已退款");
+        } else if (orderInfo.status == 5) {
+            $("#status").text("已完成");
+        }
+    }
+    function getOrderInfo() {
+        var orderId = g_getQueryString("orderId");
+        $.ajax({
+            url: "/order/info",
+            method: "GET",
+            data: {
+                orderId: orderId
+            },
+            success: function(result) {
+                if (result.code == 0) {
+                    var orderInfo = result.data;
+                    render(orderInfo);
+                } else {
+                    layer.msg(result.msg);
+                }
+            },
+            error: function() {
+                layer.msg("客户端请求错误");
+            }
+        })
+    }
+</script>
+</body>
+</html>

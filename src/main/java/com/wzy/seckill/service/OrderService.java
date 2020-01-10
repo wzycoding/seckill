@@ -16,6 +16,9 @@ public class OrderService {
     @Resource
     private OrderDao orderDao;
 
+    /**
+     * 根据用户id和商品id查询订单信息，todo:这里可以根据redis进行缓存
+     */
     public SeckillOrder getSeckillOrderByUserIdAndGoodsId(long userId, long goodsId) {
         return orderDao.getSeckillOrderByUserIdAndGoodsId(userId, goodsId);
     }

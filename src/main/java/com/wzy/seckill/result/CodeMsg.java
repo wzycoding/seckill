@@ -32,6 +32,7 @@ public class CodeMsg {
     public static CodeMsg SERVER_ERROR = new CodeMsg(500100, "服务器端异常");
     public static CodeMsg BIND_ERROR = new CodeMsg(500101, "参数校验异常：%s");
     public static CodeMsg FREQUENT_VISITS = new CodeMsg(500102, "访问过于频繁，请稍后再试");
+    public static CodeMsg NOT_LOGIN = new CodeMsg(500103, "您还未登录，请登录后访问");
 
     //登录模块5002xx
     public static CodeMsg SESSION_ERROR = new CodeMsg(500200, "Session不存在或者已经失效");
@@ -43,9 +44,11 @@ public class CodeMsg {
     public static CodeMsg PASSWORD_ERROR = new CodeMsg(500205, "密码错误");
 
     //商品模块5003xx
-
+    public static CodeMsg GOODS_NOT_EXIST  = new CodeMsg(500400, "商品不存在");
 
     //订单模块5004xx
+    public static CodeMsg ORDER_NOT_EXIST  = new CodeMsg(500400, "订单不存在");
+
 
     //秒杀模块5005xx
     public static CodeMsg STOCK_OVER  = new CodeMsg(500500, "商品已经秒杀结束");

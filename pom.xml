@@ -109,6 +109,12 @@
       <version>28.0-jre</version>
     </dependency>
 
+    <!-- 引入消息队列 -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-amqp</artifactId>
+    </dependency>
+
 
     <!--单元测试-->
     <dependency>

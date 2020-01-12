@@ -23,6 +23,9 @@ public class OrderService {
         return orderDao.getSeckillOrderByUserIdAndGoodsId(userId, goodsId);
     }
 
+    /**
+     * 创建订单：创建一个订单，再创建一个秒杀订单
+     */
     public OrderInfo createOrder(SeckillUser user, GoodsVo goodsVo) {
         OrderInfo orderInfo = new OrderInfo();
         orderInfo.setPayDate(new Date());
@@ -35,15 +38,19 @@ public class OrderService {
         orderInfo.setOrderChannel((byte) 1);
         orderInfo.setStatus((byte) 0);
         orderInfo.setUserId(user.getId());
-        long orderId = orderDao.insert(orderInfo);
+        //这里的主键不是通过返回值形式的，而是通过注入到对象中
+        orderDao.insert(orderInfo);
         SeckillOrder seckillOrder = new SeckillOrder();
         seckillOrder.setGoodsId(goodsVo.getId());
-        seckillOrder.setOrderId(orderId);
+        seckillOrder.setOrderId(orderInfo.getId());
         seckillOrder.setUserId(user.getId());
         orderDao.insertSeckillOrder(seckillOrder);
         return orderInfo;
     }
 
+    /**
+     * 根据订单id获取订单信息
+     */
     public OrderInfo getOrderById(long orderId) {
         return orderDao.getOrderById(orderId);
     }

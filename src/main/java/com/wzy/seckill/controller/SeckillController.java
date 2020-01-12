@@ -3,6 +3,9 @@ package com.wzy.seckill.controller;
 import com.wzy.seckill.domain.OrderInfo;
 import com.wzy.seckill.domain.SeckillOrder;
 import com.wzy.seckill.domain.SeckillUser;
+import com.wzy.seckill.rabbitmq.MQSender;
+import com.wzy.seckill.rabbitmq.SeckillMessage;
+import com.wzy.seckill.redis.GoodsKey;
 import com.wzy.seckill.redis.RedisService;
 import com.wzy.seckill.result.CodeMsg;
 import com.wzy.seckill.result.Result;
@@ -11,31 +14,52 @@ import com.wzy.seckill.service.OrderService;
 import com.wzy.seckill.service.SeckillService;
 import com.wzy.seckill.vo.GoodsVo;
 import com.wzy.seckill.vo.OrderInfoVo;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 秒杀Controller
  */
 @Controller
 @RequestMapping("/seckill")
-public class SeckillController {
+public class SeckillController implements InitializingBean {
     /**
      * 秒杀商品接口
      */
-    @RequestMapping(value = "/do_seckill", method = RequestMethod.POST)
+    @PostMapping(value = "/do_seckill")
     @ResponseBody
-    public Result<OrderInfoVo> doSeckill(SeckillUser user,
+    public Result<Integer> doSeckill(SeckillUser user,
                                     @RequestParam("goodsId")long goodsId) {
         if (user == null) {
             return Result.error(CodeMsg.NOT_LOGIN);
         }
+        //预减库存
+        long stock = redisService.decr(GoodsKey.getSeckillGoodsStock, "" + goodsId);
+        //如果减完之后小于0则秒杀失败
+        if (stock < 0) {
+            return Result.error(CodeMsg.STOCK_OVER);
+        }
+
+        //判断是否已经秒杀到了
+        SeckillOrder order = orderService.getSeckillOrderByUserIdAndGoodsId(user.getId(), goodsId);
+        if (order != null) {
+            return Result.error(CodeMsg.REPEAT_SECKILL);
+        }
+
+        SeckillMessage msg = new SeckillMessage();
+        msg.setGoodsId(goodsId);
+        msg.setUser(user);
+        //入队
+        sender.sendSeckillMessage(msg);
+
+        return Result.success(0);
+        /*
         //判断库存
         GoodsVo goodsVo = goodsService.getGoodsVoByGoodsId(goodsId);
         int stock = goodsVo.getGoodsStock();
@@ -55,7 +79,19 @@ public class SeckillController {
         orderInfoVo.setGoods(goodsVo);
         orderInfoVo.setOrderInfo(orderInfo);
         return Result.success(orderInfoVo);
+        */
     }
+
+    @GetMapping(value = "/result")
+    @ResponseBody
+    public Result<Long> result(SeckillUser user,@RequestParam("goodsId") long goodsId) {
+        if (user == null) {
+            return Result.error(CodeMsg.NOT_LOGIN);
+        }
+        long result = seckillService.getSeckillResult(user, goodsId);
+        return Result.success(result);
+    }
+
 
     @Resource
     private GoodsService goodsService;
@@ -68,4 +104,21 @@ public class SeckillController {
 
     @Resource
     private SeckillService seckillService;
+
+    @Autowired
+    private MQSender sender;
+
+    /**
+     * 如果实现了InitializingBean接口就回去回调这个方法
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        List<GoodsVo> goodsList = goodsService.listGoodsVo();
+        if (goodsList == null) {
+            return;
+        }
+        for (GoodsVo goods : goodsList) {
+            redisService.set(GoodsKey.getSeckillGoodsStock, "" + goods.getId(), goods.getStockCount());
+        }
+    }
 }

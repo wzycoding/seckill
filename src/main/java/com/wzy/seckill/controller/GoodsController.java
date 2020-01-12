@@ -2,7 +2,7 @@ package com.wzy.seckill.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.wzy.seckill.domain.SeckillUser;
-import com.wzy.seckill.redis.GoodsPrefix;
+import com.wzy.seckill.redis.GoodsKey;
 import com.wzy.seckill.redis.RedisService;
 import com.wzy.seckill.result.Result;
 import com.wzy.seckill.service.GoodsService;
@@ -49,7 +49,7 @@ public class GoodsController {
                          SeckillUser seckillUser) {
 
         //取缓存
-        String html = redisService.get(GoodsPrefix.goodsList, "", String.class);
+        String html = redisService.get(GoodsKey.goodsList, "", String.class);
         if (StringUtils.isNotBlank(html)) {
             return html;
         }
@@ -62,7 +62,7 @@ public class GoodsController {
         WebContext ctx = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
         html = thymeleafViewResolver.getTemplateEngine().process("goods_list", ctx);
         if (StringUtils.isNotBlank(html)) {
-            redisService.set(GoodsPrefix.goodsList, "", html);
+            redisService.set(GoodsKey.goodsList, "", html);
         }
 
         return html;
@@ -129,14 +129,14 @@ public class GoodsController {
         model.addAttribute("remainSeconds", remainSeconds);
         model.addAttribute("goods", goods);
 
-        String html = redisService.get(GoodsPrefix.goodsDetail, "" + goodsId, String.class);
+        String html = redisService.get(GoodsKey.goodsDetail, "" + goodsId, String.class);
         if (StringUtils.isNotBlank(html)) {
             return html;
         }
         WebContext ctx = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
         html = thymeleafViewResolver.getTemplateEngine().process("goods_detail", ctx);
         if (StringUtils.isNotBlank(html)) {
-            redisService.set(GoodsPrefix.goodsDetail, "" + goodsId, html);
+            redisService.set(GoodsKey.goodsDetail, "" + goodsId, html);
         }
         return html;
     }

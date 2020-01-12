@@ -74,7 +74,8 @@
             success:function (result) {
                 if (result.code == 0) {
                     console.log(result.data)
-                    window.location.href = "/order_detail.htm?orderId=" + result.data.orderInfo.id;
+                    getSeckillResult();
+                    // window.location.href = "/order_detail.htm?orderId=" + result.data.orderInfo.id;
                 } else {
                     layer.msg(result.msg)
                 }
@@ -83,6 +84,44 @@
                 layer.msg("客户端请求错误")
             }
         });
+    }
+
+    function getSeckillResult() {
+        g_showLoading();
+        var goodsId = $("#goodsId").val();
+        $.ajax({
+            url: "/seckill/result",
+            method: "GET",
+            data: {
+              goodsId: goodsId
+            },
+            success: function (data) {
+                var result = data.data;
+                if (data.code == 0) {
+                    if (result == 0) {
+                        setTimeout(function () {
+                            getSeckillResult();
+                        }, 200);
+                    } else if (result == -1) {
+                        layer.msg("秒杀失败")
+                    } else if (result > 0){
+                        layer.confirm("恭喜你，秒杀成功！查看订单？", {btn:["确定", "取消"]},
+                            function () {
+                                window.location.href = "/order_detail.htm?orderId=" + result;
+                            },
+                            function () {
+                                layer.closeAll();
+                            }
+                        )
+                    }
+                } else {
+                    layer.msg(data.msg)
+                }
+            },
+            error: function () {
+                layer.msg("客户端请求错误")
+            }
+        })
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.wzy.seckill.config;
 
+import com.wzy.seckill.access.UserContext;
 import com.wzy.seckill.domain.SeckillUser;
 import com.wzy.seckill.service.SeckillUserService;
 import org.apache.commons.lang3.StringUtils;
@@ -24,9 +25,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Service
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
-
-    @Autowired
-    private SeckillUserService userService;
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
         Class<?> clazz = methodParameter.getParameterType();
@@ -39,28 +37,6 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
                                   @Nullable ModelAndViewContainer modelAndViewContainer,
                                   NativeWebRequest nativeWebRequest,
                                   @Nullable WebDataBinderFactory webDataBinderFactory) throws Exception {
-        HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
-        HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
-
-        String paramToken = request.getParameter(SeckillUserService.COOKIE_NAME_TOKEN);
-        String cookieToken = getCookieValue(request, SeckillUserService.COOKIE_NAME_TOKEN);
-        if (StringUtils.isBlank(cookieToken) && StringUtils.isBlank(paramToken)) {
-            return null;
-        }
-        String token = StringUtils.isBlank(paramToken)? cookieToken: paramToken;
-        return userService.getByToken(response, token);
-    }
-
-    private String getCookieValue(HttpServletRequest request, String cookieName) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null || cookies.length <= 0) {
-            return null;
-        }
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(cookieName)) {
-                return cookie.getValue();
-            }
-        }
-        return null;
+        return UserContext.getUser();
     }
 }

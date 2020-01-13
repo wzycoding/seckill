@@ -33,6 +33,8 @@ public class CodeMsg {
     public static CodeMsg BIND_ERROR = new CodeMsg(500101, "参数校验异常：%s");
     public static CodeMsg FREQUENT_VISITS = new CodeMsg(500102, "访问过于频繁，请稍后再试");
     public static CodeMsg NOT_LOGIN = new CodeMsg(500103, "您还未登录，请登录后访问");
+    public static CodeMsg SECKILL_FAIL = new CodeMsg(500104, "秒杀失败");
+    public static CodeMsg REQUEST_ILLEGAL = new CodeMsg(500105, "请求违法");
 
     //登录模块5002xx
     public static CodeMsg SESSION_ERROR = new CodeMsg(500200, "Session不存在或者已经失效");
@@ -53,6 +55,8 @@ public class CodeMsg {
     //秒杀模块5005xx
     public static CodeMsg STOCK_OVER  = new CodeMsg(500500, "商品已经秒杀结束");
     public static CodeMsg REPEAT_SECKILL  = new CodeMsg(500501, "请勿重复秒杀商品");
+
+    public static CodeMsg VERIFY_CODE_FAIL  = new CodeMsg(500502, "印证吗错误");
 
 
 
